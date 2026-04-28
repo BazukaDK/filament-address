@@ -139,7 +139,3 @@ $suggestions = DawaService::addressAutocomplete('Amalieg', 5);
 // Returns the single best match, or null
 $match = DawaService::bestAddressMatch('Amaliegade 18, København');
 ```
-
-## License
-
-MIT — see [LICENSE](LICENSE).
