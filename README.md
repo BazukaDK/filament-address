@@ -1,6 +1,6 @@
 # Filament DAWA
 
-A Filament v4 plugin that integrates the Danish Address Web API ([DAWA](https://dawadocs.dataforsyningen.dk/)) into your Filament forms. Provides an autocomplete input field for Danish addresses, backed by a polymorphic `Address` model.
+A Filament v5 plugin that integrates the Danish Address Web API ([DAWA](https://dawadocs.dataforsyningen.dk/)) into your Filament forms. Provides an autocomplete input field for Danish addresses, backed by a polymorphic `Address` model.
 
 ## Requirements
 
