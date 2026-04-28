@@ -1,18 +1,18 @@
 <?php
 
-namespace Bazuka\FilamentDawa;
+namespace Bazuka\FilamentAddress;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class FilamentDawaServiceProvider extends PackageServiceProvider
+class FilamentAddressServiceProvider extends PackageServiceProvider
 {
-    public static string $name = 'filament-dawa';
+    public static string $name = 'filament-address';
 
     public function configurePackage(Package $package): void
     {
         $package->name(static::$name)
-            ->hasConfigFile('dawa')
+            ->hasConfigFile('filament-address')
             ->hasViews();
     }
 
@@ -22,6 +22,6 @@ class FilamentDawaServiceProvider extends PackageServiceProvider
             __DIR__.'/../database/migrations/create_dawa_addresses_table.php.stub' => database_path(
                 'migrations/'.date('Y_m_d_His').'_create_dawa_addresses_table.php'
             ),
-        ], 'filament-dawa-migrations');
+        ], 'filament-address-migrations');
     }
 }

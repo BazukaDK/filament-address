@@ -1,10 +1,10 @@
 {
-    "name": "bazuka/filament-dawa",
-    "description": "A Filament plugin for the DAWA (Danmarks Adressers Web API) API",
+    "name": "bazuka/filament-address",
+    "description": "A Filament plugin for Danish address autocomplete",
     "keywords": [
         "filament",
         "laravel",
-        "dawa",
+        "address",
         "danish-addresses"
     ],
     "license": "MIT",
@@ -26,18 +26,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Bazuka\\FilamentDawa\\": "src/"
+            "Bazuka\\FilamentAddress\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Bazuka\\FilamentDawa\\Tests\\": "tests/"
+            "Bazuka\\FilamentAddress\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Bazuka\\FilamentDawa\\FilamentDawaServiceProvider"
+                "Bazuka\\FilamentAddress\\FilamentAddressServiceProvider"
             ]
         }
     },

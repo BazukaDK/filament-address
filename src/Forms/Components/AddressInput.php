@@ -1,16 +1,16 @@
 <?php
 
-namespace Bazuka\FilamentDawa\Forms\Components;
+namespace Bazuka\FilamentAddress\Forms\Components;
 
 use Filament\Forms\Components\Concerns\HasPlaceholder;
 use Filament\Forms\Components\Field;
 use Illuminate\Database\Eloquent\Model;
 
-class DawaInput extends Field
+class AddressInput extends Field
 {
     use HasPlaceholder;
 
-    protected string $view = 'filament-dawa::forms.components.dawa-input';
+    protected string $view = 'filament-address::forms.components.address-input';
 
     protected int $suggestionCount = 10;
 
@@ -22,7 +22,7 @@ class DawaInput extends Field
         $this->dehydrated(false);
 
         // When editing, populate the display value from the existing address relationship.
-        $this->afterStateHydrated(function (DawaInput $component, ?Model $record): void {
+        $this->afterStateHydrated(function (AddressInput $component, ?Model $record): void {
             if (! $record || ! method_exists($record, 'address')) {
                 return;
             }

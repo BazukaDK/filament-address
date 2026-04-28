@@ -1,11 +1,11 @@
 <?php
 
-namespace Bazuka\FilamentDawa;
+namespace Bazuka\FilamentAddress;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
-class FilamentDawaPlugin implements Plugin
+class FilamentAddressPlugin implements Plugin
 {
     public static function make(): static
     {
@@ -14,7 +14,7 @@ class FilamentDawaPlugin implements Plugin
 
     public function getId(): string
     {
-        return 'filament-dawa';
+        return 'filament-address';
     }
 
     public function register(Panel $panel): void

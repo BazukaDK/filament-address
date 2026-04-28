@@ -1,6 +1,6 @@
 <?php
 
-namespace Bazuka\FilamentDawa\Models;
+namespace Bazuka\FilamentAddress\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -41,12 +41,12 @@ class Address extends Model
     }
 
     /**
-     * Map a DAWA autocomplete suggestion to Address attribute values.
+     * Map an autocomplete suggestion to Address attribute values.
      *
      * @param  array<string, mixed>  $suggestion
      * @return array<string, mixed>
      */
-    public static function attributesFromDawa(array $suggestion): array
+    public static function attributesFromSuggestion(array $suggestion): array
     {
         $data = $suggestion['data'];
 
@@ -74,7 +74,7 @@ class Address extends Model
     public static function getModel(): string
     {
         /** @var class-string<static> $model */
-        $model = config('dawa.address_model', static::class);
+        $model = config('filament-address.address_model', static::class);
 
         return $model;
     }

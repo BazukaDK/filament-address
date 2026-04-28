@@ -1,10 +1,10 @@
 <?php
 
-namespace Bazuka\FilamentDawa\Services;
+namespace Bazuka\FilamentAddress\Services;
 
 use Illuminate\Support\Facades\Http;
 
-class DawaService
+class AddressService
 {
     /**
      * @return array<int, array<string, mixed>>

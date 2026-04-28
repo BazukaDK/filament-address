@@ -1,8 +1,8 @@
 <?php
 
-namespace Bazuka\FilamentDawa\Concerns;
+namespace Bazuka\FilamentAddress\Concerns;
 
-use Bazuka\FilamentDawa\Models\Address;
+use Bazuka\FilamentAddress\Models\Address;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -29,14 +29,14 @@ trait HasAddresses
     }
 
     /**
-     * Create or update an address from a DAWA autocomplete suggestion.
+     * Create or update an address from an autocomplete suggestion.
      *
      * @param  array<string, mixed>  $suggestion
      */
     public function addAddress(array $suggestion, ?string $label = null): Address
     {
         $model = Address::getModel();
-        $attributes = $model::attributesFromDawa($suggestion);
+        $attributes = $model::attributesFromSuggestion($suggestion);
 
         /** @var Address $address */
         $address = $this->addresses()->updateOrCreate(

@@ -1,4 +1,4 @@
-# Filament DAWA
+# Filament Address
 
 A Filament v5 plugin that integrates the Danish Address Web API ([DAWA](https://dawadocs.dataforsyningen.dk/)) into your Filament forms. Provides an autocomplete input field for Danish addresses, backed by a polymorphic `Address` model.
 
@@ -13,32 +13,32 @@ A Filament v5 plugin that integrates the Danish Address Web API ([DAWA](https://
 Install via Composer:
 
 ```bash
-composer require bazuka/filament-dawa
+composer require bazuka/filament-address
 ```
 
 Publish and run the migration:
 
 ```bash
-php artisan vendor:publish --tag=filament-dawa-migrations
+php artisan vendor:publish --tag=filament-address-migrations
 php artisan migrate
 ```
 
 Optionally publish the config:
 
 ```bash
-php artisan vendor:publish --tag=filament-dawa-config
+php artisan vendor:publish --tag=filament-address-config
 ```
 
 Register the plugin in your Filament panel provider:
 
 ```php
-use Bazuka\FilamentDawa\FilamentDawaPlugin;
+use Bazuka\FilamentAddress\FilamentAddressPlugin;
 
 public function panel(Panel $panel): Panel
 {
     return $panel
         ->plugins([
-            FilamentDawaPlugin::make(),
+            FilamentAddressPlugin::make(),
         ]);
 }
 ```
@@ -50,7 +50,7 @@ public function panel(Panel $panel): Panel
 Add the `HasAddresses` trait to any Eloquent model that should have addresses:
 
 ```php
-use Bazuka\FilamentDawa\Concerns\HasAddresses;
+use Bazuka\FilamentAddress\Concerns\HasAddresses;
 
 class Customer extends Model
 {
@@ -67,12 +67,12 @@ This gives the model two relationships:
 
 ### 2. Add the form field
 
-Use `DawaInput` in any Filament form. When the user picks a suggestion, the address is automatically saved via the `HasAddresses` trait:
+Use `AddressInput` in any Filament form. When the user picks a suggestion, the address is automatically saved via the `HasAddresses` trait:
 
 ```php
-use Bazuka\FilamentDawa\Forms\Components\DawaInput;
+use Bazuka\FilamentAddress\Forms\Components\AddressInput;
 
-DawaInput::make('address')
+AddressInput::make('address')
     ->label('Address')
     ->placeholder('Start typing an address…')
     ->suggestionCount(8),
@@ -114,28 +114,32 @@ $customer->address->longitude;         // 12.5856...
 ## Configuration
 
 ```php
-// config/dawa.php
+// config/filament-address.php
 return [
-    'address_model' => \Bazuka\FilamentDawa\Models\Address::class,
+    'address_model' => \Bazuka\FilamentAddress\Models\Address::class,
 ];
 ```
 
-You can swap in your own model as long as it extends `Bazuka\FilamentDawa\Models\Address`:
+You can swap in your own model as long as it extends `Bazuka\FilamentAddress\Models\Address`:
 
 ```php
 'address_model' => \App\Models\Address::class,
 ```
 
-## DawaService
+## AddressService
 
 For programmatic address lookup outside of forms:
 
 ```php
-use Bazuka\FilamentDawa\Services\DawaService;
+use Bazuka\FilamentAddress\Services\AddressService;
 
 // Returns up to $count suggestions
-$suggestions = DawaService::addressAutocomplete('Amalieg', 5);
+$suggestions = AddressService::addressAutocomplete('Amalieg', 5);
 
 // Returns the single best match, or null
-$match = DawaService::bestAddressMatch('Amaliegade 18, København');
+$match = AddressService::bestAddressMatch('Amaliegade 18, København');
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
