@@ -5,7 +5,7 @@ A Filament v5 plugin that integrates the Danish Address Web API ([DAWA](https://
 ## Requirements
 
 - PHP 8.2+
-- Laravel 10+
+- Laravel 11.28+
 - Filament 5+
 
 ## Installation
