@@ -10,9 +10,11 @@
             showSuggestions: false,
             loading: false,
             debounceTimer: null,
+            isSelected: false,
 
             init() {
                 // state is a string when hydrated from an existing address, an object after a new selection
+                this.isSelected = !! this.state;
                 this.query = this.displayText(this.state);
 
                 this.$watch('state', (value) => {
@@ -31,6 +33,7 @@
             },
 
             onInput() {
+                this.isSelected = false;
                 clearTimeout(this.debounceTimer);
                 this.debounceTimer = setTimeout(() => this.search(), 300);
             },
@@ -58,8 +61,16 @@
             },
 
             select(suggestion) {
+                if (suggestion.type === 'vejnavn') {
+                    this.query = suggestion.tekst.trim();
+                    this.isSelected = false;
+                    this.search();
+                    return;
+                }
+
                 this.state = suggestion;
-                this.query = suggestion.tekst;
+                this.query = this.cleanText(suggestion.tekst);
+                this.isSelected = true;
                 this.suggestions = [];
                 this.showSuggestions = false;
             },
@@ -88,6 +99,14 @@
                 autocomplete="off"
             />
         </x-filament::input.wrapper>
+
+        <p
+            x-show="query && ! isSelected"
+            x-cloak
+            class="mt-1 text-xs text-warning-600 dark:text-warning-400"
+        >
+            {{ __('Select an address from the suggestions') }}
+        </p>
 
         <div
             x-show="showSuggestions"
