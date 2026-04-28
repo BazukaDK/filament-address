@@ -3,12 +3,16 @@
 namespace Bazuka\FilamentDawa\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Address extends Model
 {
     protected $table = 'dawa_addresses';
 
     protected $fillable = [
+        'addressable_id',
+        'addressable_type',
+        'label',
         'dawa_id',
         'tekst',
         'vejnavn',
@@ -31,34 +35,35 @@ class Address extends Model
         ];
     }
 
+    public function addressable(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
     /**
-     * Create or update an Address from a DAWA autocomplete suggestion.
+     * Map a DAWA autocomplete suggestion to Address attribute values.
      *
-     * @param  array<string, mixed>  $suggestion  A single item from the DAWA autocomplete response
+     * @param  array<string, mixed>  $suggestion
+     * @return array<string, mixed>
      */
-    public static function fromDawa(array $suggestion): static
+    public static function attributesFromDawa(array $suggestion): array
     {
         $data = $suggestion['data'];
 
-        /** @var static $address */
-        $address = static::updateOrCreate(
-            ['dawa_id' => $data['id']],
-            [
-                'tekst' => $suggestion['tekst'],
-                'vejnavn' => $data['vejnavn'],
-                'husnr' => $data['husnr'],
-                'etage' => $data['etage'] ?? null,
-                'dør' => $data['dør'] ?? null,
-                'postnr' => $data['postnr'],
-                'postnrnavn' => $data['postnrnavn'],
-                'kommunekode' => $data['kommunekode'],
-                'longitude' => $data['x'] ?? null,
-                'latitude' => $data['y'] ?? null,
-                'adgangsadresse_id' => $data['adgangsadresseid'] ?? null,
-            ]
-        );
-
-        return $address;
+        return [
+            'dawa_id' => $data['id'],
+            'tekst' => $suggestion['tekst'],
+            'vejnavn' => $data['vejnavn'],
+            'husnr' => $data['husnr'],
+            'etage' => $data['etage'] ?? null,
+            'dør' => $data['dør'] ?? null,
+            'postnr' => $data['postnr'],
+            'postnrnavn' => $data['postnrnavn'],
+            'kommunekode' => $data['kommunekode'],
+            'longitude' => $data['x'] ?? null,
+            'latitude' => $data['y'] ?? null,
+            'adgangsadresse_id' => $data['adgangsadresseid'] ?? null,
+        ];
     }
 
     /**

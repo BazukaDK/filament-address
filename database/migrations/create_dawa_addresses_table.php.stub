@@ -11,8 +11,14 @@ return new class extends Migration
         Schema::create('dawa_addresses', function (Blueprint $table) {
             $table->id();
 
-            // DAWA identifier — unique per address unit
-            $table->string('dawa_id', 36)->unique();
+            // Polymorphic owner — attach to any model via HasAddresses trait
+            $table->morphs('addressable');
+
+            // Optional label to distinguish multiple addresses on one model (e.g. 'billing', 'shipping')
+            $table->string('label')->nullable();
+
+            // DAWA identifier
+            $table->string('dawa_id', 36)->index();
 
             // Full formatted address string from DAWA (e.g. "Hersegade 18, 1. th, 4000 Roskilde")
             $table->string('tekst');
@@ -38,9 +44,6 @@ return new class extends Migration
             $table->string('adgangsadresse_id', 36)->nullable();
 
             $table->timestamps();
-
-            // TODO: add your foreign key here, e.g.:
-            // $table->foreignId('user_id')->constrained()->cascadeOnDelete();
         });
     }
 
