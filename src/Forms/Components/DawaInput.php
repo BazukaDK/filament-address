@@ -2,10 +2,13 @@
 
 namespace Bazuka\FilamentDawa\Forms\Components;
 
+use Filament\Forms\Components\Concerns\HasPlaceholder;
 use Filament\Forms\Components\Field;
 
 class DawaInput extends Field
 {
+    use HasPlaceholder;
+
     protected string $view = 'filament-dawa::forms.components.dawa-input';
 
     protected int $suggestionCount = 10;
