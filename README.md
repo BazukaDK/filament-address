@@ -29,7 +29,27 @@ Optionally publish the config:
 php artisan vendor:publish --tag=filament-address-config
 ```
 
-Register the plugin in your Filament panel provider:
+### Custom Theme (required)
+
+This plugin uses Tailwind CSS utility classes, so your Filament panel must have a custom theme. If you haven't created one yet:
+
+```bash
+php artisan make:filament-theme
+```
+
+Follow the output instructions to register the theme in your panel provider, then add the plugin's views as a Tailwind source in the generated theme CSS file (e.g. `resources/css/filament/admin/theme.css`):
+
+```css
+@source '../../../../vendor/bazuka/filament-address/resources/views/**/*';
+```
+
+Then rebuild your assets:
+
+```bash
+npm run build
+```
+
+### Register the plugin in your Filament panel provider:
 
 ```php
 use Bazuka\FilamentAddress\FilamentAddressPlugin;
