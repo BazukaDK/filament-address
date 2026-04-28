@@ -12,13 +12,17 @@
             debounceTimer: null,
 
             init() {
-                this.query = this.state ?? '';
+                // state is a string when hydrated from an existing address, an object after a new selection
+                this.query = this.displayText(this.state);
 
                 this.$watch('state', (value) => {
-                    if (value !== this.query) {
-                        this.query = value ?? '';
-                    }
+                    this.query = this.displayText(value);
                 });
+            },
+
+            displayText(value) {
+                if (! value) { return ''; }
+                return typeof value === 'string' ? value : (value.tekst ?? '');
             },
 
             onInput() {
@@ -49,7 +53,7 @@
             },
 
             select(suggestion) {
-                this.state = suggestion.tekst;
+                this.state = suggestion;
                 this.query = suggestion.tekst;
                 this.suggestions = [];
                 this.showSuggestions = false;

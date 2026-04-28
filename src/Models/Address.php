@@ -35,6 +35,18 @@ class Address extends Model
         ];
     }
 
+    /** @deprecated Use attributesFromDawa() + HasAddresses::addAddress() instead. */
+    public static function fromDawa(array $suggestion): static
+    {
+        /** @var static $address */
+        $address = static::updateOrCreate(
+            ['dawa_id' => $suggestion['data']['id']],
+            static::attributesFromDawa($suggestion)
+        );
+
+        return $address;
+    }
+
     public function addressable(): MorphTo
     {
         return $this->morphTo();
