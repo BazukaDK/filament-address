@@ -85,12 +85,12 @@ The field calls the DAWA autocomplete API directly from the browser as the user 
 ```php
 $customer = Customer::with('address')->find($id);
 
-$customer->address->formatted_address; // "Hersegade 18, 1. th, 4000 Roskilde"
-$customer->address->street_name;       // "Hersegade"
-$customer->address->postal_code;       // "4000"
-$customer->address->city;              // "Roskilde"
-$customer->address->latitude;          // 55.6418...
-$customer->address->longitude;         // 12.0801...
+$customer->address->formatted_address; // "Amaliegade 18, 1256 København K"
+$customer->address->street_name;       // "Amaliegade"
+$customer->address->postal_code;       // "1256"
+$customer->address->city;              // "København K"
+$customer->address->latitude;          // 55.6810...
+$customer->address->longitude;         // 12.5856...
 ```
 
 ## Available Address Attributes
@@ -134,10 +134,10 @@ For programmatic address lookup outside of forms:
 use Bazuka\FilamentDawa\Services\DawaService;
 
 // Returns up to $count suggestions
-$suggestions = DawaService::addressAutocomplete('Herseg', 5);
+$suggestions = DawaService::addressAutocomplete('Amalieg', 5);
 
 // Returns the single best match, or null
-$match = DawaService::bestAddressMatch('Hersegade 18, Roskilde');
+$match = DawaService::bestAddressMatch('Amaliegade 18, København');
 ```
 
 ## License
