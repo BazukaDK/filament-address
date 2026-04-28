@@ -52,7 +52,7 @@ class Address extends Model
 
         return [
             'dawa_id' => $data['id'],
-            'formatted_address' => $suggestion['tekst'],
+            'formatted_address' => static::cleanText($suggestion['tekst']),
             'street_name' => $data['vejnavn'],
             'house_number' => $data['husnr'],
             'floor' => $data['etage'] ?? null,
@@ -64,6 +64,13 @@ class Address extends Model
             'latitude' => $data['y'] ?? null,
             'access_address_id' => $data['adgangsadresseid'] ?? null,
         ];
+    }
+
+    public static function cleanText(string $text): string
+    {
+        $parts = array_filter(array_map('trim', explode(',', $text)));
+
+        return implode(', ', $parts);
     }
 
     /**

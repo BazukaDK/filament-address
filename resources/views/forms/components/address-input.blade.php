@@ -22,7 +22,12 @@
 
             displayText(value) {
                 if (! value) { return ''; }
-                return typeof value === 'string' ? value : (value.tekst ?? '');
+                const text = typeof value === 'string' ? value : (value.tekst ?? '');
+                return this.cleanText(text);
+            },
+
+            cleanText(text) {
+                return text.split(',').map(s => s.trim()).filter(s => s).join(', ');
             },
 
             onInput() {
@@ -101,7 +106,7 @@
                         <button
                             type="button"
                             class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-primary-50 focus:bg-primary-50 focus:text-primary-600 focus:outline-none dark:text-gray-200 dark:hover:bg-primary-600/10 dark:focus:bg-primary-600/10 dark:focus:text-primary-400"
-                            x-text="suggestion.tekst"
+                            x-text="cleanText(suggestion.tekst)"
                             x-on:click="select(suggestion)"
                             x-on:keydown.enter.prevent="select(suggestion)"
                             x-on:keydown.arrow-down.prevent="$focus.next()"
