@@ -77,20 +77,30 @@
                 x-on:focus="query.length >= 2 && suggestions.length > 0 && (showSuggestions = true)"
                 x-on:keydown.escape="showSuggestions = false"
                 x-on:keydown.arrow-down.prevent="$focus.within($el.closest('.relative').querySelector('[role=listbox]')).first()"
+                role="combobox"
+                x-bind:aria-expanded="showSuggestions"
+                aria-autocomplete="list"
+                autocomplete="off"
             />
         </x-filament::input.wrapper>
 
         <div
             x-show="showSuggestions"
             x-cloak
-            class="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="opacity-0 -translate-y-1 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+            x-transition:leave-end="opacity-0 -translate-y-1 scale-95"
+            class="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-gray-900"
         >
-            <ul role="listbox">
+            <ul role="listbox" class="divide-y divide-gray-100 dark:divide-white/5">
                 <template x-for="(suggestion, index) in suggestions" :key="index">
                     <li role="option">
                         <button
                             type="button"
-                            class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none dark:text-gray-200 dark:hover:bg-white/5 dark:focus:bg-white/5"
+                            class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-primary-50 focus:bg-primary-50 focus:text-primary-600 focus:outline-none dark:text-gray-200 dark:hover:bg-primary-600/10 dark:focus:bg-primary-600/10 dark:focus:text-primary-400"
                             x-text="suggestion.tekst"
                             x-on:click="select(suggestion)"
                             x-on:keydown.enter.prevent="select(suggestion)"
