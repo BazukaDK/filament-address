@@ -14,17 +14,17 @@ class Address extends Model
         'addressable_type',
         'label',
         'dawa_id',
-        'tekst',
-        'vejnavn',
-        'husnr',
-        'etage',
-        'dør',
-        'postnr',
-        'postnrnavn',
-        'kommunekode',
+        'formatted_address',
+        'street_name',
+        'house_number',
+        'floor',
+        'door',
+        'postal_code',
+        'city',
+        'municipality_code',
         'longitude',
         'latitude',
-        'adgangsadresse_id',
+        'access_address_id',
     ];
 
     protected function casts(): array
@@ -33,18 +33,6 @@ class Address extends Model
             'longitude' => 'float',
             'latitude' => 'float',
         ];
-    }
-
-    /** @deprecated Use attributesFromDawa() + HasAddresses::addAddress() instead. */
-    public static function fromDawa(array $suggestion): static
-    {
-        /** @var static $address */
-        $address = static::updateOrCreate(
-            ['dawa_id' => $suggestion['data']['id']],
-            static::attributesFromDawa($suggestion)
-        );
-
-        return $address;
     }
 
     public function addressable(): MorphTo
@@ -64,17 +52,17 @@ class Address extends Model
 
         return [
             'dawa_id' => $data['id'],
-            'tekst' => $suggestion['tekst'],
-            'vejnavn' => $data['vejnavn'],
-            'husnr' => $data['husnr'],
-            'etage' => $data['etage'] ?? null,
-            'dør' => $data['dør'] ?? null,
-            'postnr' => $data['postnr'],
-            'postnrnavn' => $data['postnrnavn'],
-            'kommunekode' => $data['kommunekode'],
+            'formatted_address' => $suggestion['tekst'],
+            'street_name' => $data['vejnavn'],
+            'house_number' => $data['husnr'],
+            'floor' => $data['etage'] ?? null,
+            'door' => $data['dør'] ?? null,
+            'postal_code' => $data['postnr'],
+            'city' => $data['postnrnavn'],
+            'municipality_code' => $data['kommunekode'],
             'longitude' => $data['x'] ?? null,
             'latitude' => $data['y'] ?? null,
-            'adgangsadresse_id' => $data['adgangsadresseid'] ?? null,
+            'access_address_id' => $data['adgangsadresseid'] ?? null,
         ];
     }
 

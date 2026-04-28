@@ -20,28 +20,28 @@ return new class extends Migration
             // DAWA identifier
             $table->string('dawa_id', 36)->index();
 
-            // Full formatted address string from DAWA (e.g. "Hersegade 18, 1. th, 4000 Roskilde")
-            $table->string('tekst');
+            // Full formatted address string (e.g. "Hersegade 18, 1. th, 4000 Roskilde")
+            $table->string('formatted_address');
 
             // Street
-            $table->string('vejnavn');
-            $table->string('husnr', 10);
-            $table->string('etage', 10)->nullable();
-            $table->string('dør', 10)->nullable();
+            $table->string('street_name');
+            $table->string('house_number', 10);
+            $table->string('floor', 10)->nullable();
+            $table->string('door', 10)->nullable();
 
             // Postal
-            $table->string('postnr', 10);
-            $table->string('postnrnavn');
+            $table->string('postal_code', 10);
+            $table->string('city');
 
             // Municipality
-            $table->string('kommunekode', 10);
+            $table->string('municipality_code', 10);
 
             // Coordinates (WGS84)
             $table->decimal('longitude', 10, 7)->nullable();
             $table->decimal('latitude', 10, 7)->nullable();
 
             // DAWA access address reference
-            $table->string('adgangsadresse_id', 36)->nullable();
+            $table->string('access_address_id', 36)->nullable();
 
             $table->timestamps();
         });

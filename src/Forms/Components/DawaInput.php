@@ -27,7 +27,7 @@ class DawaInput extends Field
                 return;
             }
 
-            $component->state($record->address?->tekst);
+            $component->state($record->address?->formatted_address);
         });
 
         // After the record is saved, persist the selected suggestion via HasAddresses.
