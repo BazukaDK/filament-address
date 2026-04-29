@@ -125,7 +125,7 @@
             x-cloak
             class="mt-1 text-xs text-warning-600 dark:text-warning-400"
         >
-            {{ __('Select an address from the suggestions') }}
+            {{ __('filament-address::address.select_from_suggestions') }}
         </p>
 
         <div
@@ -133,13 +133,13 @@
             x-cloak
             class="mt-1 flex items-center justify-between gap-2 text-xs text-danger-600 dark:text-danger-400"
         >
-            <span>{{ __('Address lookup unavailable.') }}</span>
+            <span>{{ __('filament-address::address.lookup_unavailable') }}</span>
             <button
                 type="button"
                 x-on:click="enterManualMode()"
                 class="font-medium underline hover:no-underline focus:outline-none"
             >
-                {{ __('Enter address manually') }}
+                {{ __('filament-address::address.enter_manually') }}
             </button>
         </div>
 
@@ -148,7 +148,7 @@
             x-cloak
             class="mt-1 text-xs text-gray-500 dark:text-gray-400"
         >
-            {{ __('Manually entered — will be normalized overnight') }}
+            {{ __('filament-address::address.manually_entered') }}
         </p>
 
         <div
