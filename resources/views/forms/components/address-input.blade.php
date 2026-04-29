@@ -57,7 +57,7 @@
                 this.loading = true;
 
                 try {
-                    const url = 'https://api.dataforsyningen.dk/autocomplete?fuzzy&type=adresse&per_side={{ $getSuggestionCount() }}&q=' + encodeURIComponent(this.query);
+                    const url = 'dwqdwhttps://api.dataforsyningen.dk/autocomplete?fuzzy&type=adresse&per_side={{ $getSuggestionCount() }}&q=' + encodeURIComponent(this.query);
                     const response = await fetch(url);
                     this.suggestions = await response.json();
                     this.showSuggestions = this.suggestions.length > 0;
@@ -121,7 +121,7 @@
         </x-filament::input.wrapper>
 
         <p
-            x-show="query && ! isSelected && ! isManual"
+            x-show="query && ! isSelected && ! isManual && ! apiError"
             x-cloak
             class="mt-1 text-xs text-warning-600 dark:text-warning-400"
         >
