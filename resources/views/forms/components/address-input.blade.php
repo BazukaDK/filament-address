@@ -57,7 +57,7 @@
                 this.loading = true;
 
                 try {
-                    const url = 'dwqdwhttps://api.dataforsyningen.dk/autocomplete?fuzzy&type=adresse&per_side={{ $getSuggestionCount() }}&q=' + encodeURIComponent(this.query);
+                    const url = 'https://api.dataforsyningen.dk/autocomplete?fuzzy&type=adresse&per_side={{ $getSuggestionCount() }}&q=' + encodeURIComponent(this.query);
                     const response = await fetch(url);
                     this.suggestions = await response.json();
                     this.showSuggestions = this.suggestions.length > 0;
