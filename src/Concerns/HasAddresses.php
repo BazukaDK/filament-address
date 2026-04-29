@@ -29,6 +29,44 @@ trait HasAddresses
     }
 
     /**
+     * Create or update a manually entered address, clearing all DAWA fields so the
+     * nightly normalization command can fill them in later.
+     */
+    public function addManualAddress(string $formatted, ?string $label = null): Address
+    {
+        $model = Address::getModel();
+
+        $existing = $this->addresses()->where('label', $label)->first();
+
+        if ($existing) {
+            $existing->update([
+                'formatted_address' => $formatted,
+                'dawa_id' => null,
+                'street_name' => null,
+                'house_number' => null,
+                'floor' => null,
+                'door' => null,
+                'postal_code' => null,
+                'city' => null,
+                'municipality_code' => null,
+                'longitude' => null,
+                'latitude' => null,
+                'access_address_id' => null,
+            ]);
+
+            return $existing->fresh();
+        }
+
+        /** @var Address $address */
+        $address = $this->addresses()->create([
+            'formatted_address' => $formatted,
+            'label' => $label,
+        ]);
+
+        return $address;
+    }
+
+    /**
      * Create or update an address from an autocomplete suggestion.
      *
      * @param  array<string, mixed>  $suggestion

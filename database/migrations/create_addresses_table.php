@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('dawa_addresses', function (Blueprint $table) {
+        Schema::create('addresses', function (Blueprint $table) {
             $table->id();
 
             // Polymorphic owner — attach to any model via HasAddresses trait
@@ -17,24 +17,24 @@ return new class extends Migration
             // Optional label to distinguish multiple addresses on one model (e.g. 'billing', 'shipping')
             $table->string('label')->nullable();
 
-            // DAWA identifier
-            $table->string('dawa_id', 36)->index();
+            // DAWA identifier — null for manually entered addresses pending normalization
+            $table->string('dawa_id', 36)->nullable()->index();
 
             // Full formatted address string (e.g. "Hersegade 18, 1. th, 4000 Roskilde")
             $table->string('formatted_address');
 
             // Street
-            $table->string('street_name');
-            $table->string('house_number', 10);
+            $table->string('street_name')->nullable();
+            $table->string('house_number', 10)->nullable();
             $table->string('floor', 10)->nullable();
             $table->string('door', 10)->nullable();
 
             // Postal
-            $table->string('postal_code', 10);
-            $table->string('city');
+            $table->string('postal_code', 10)->nullable();
+            $table->string('city')->nullable();
 
             // Municipality
-            $table->string('municipality_code', 10);
+            $table->string('municipality_code', 10)->nullable();
 
             // Coordinates (WGS84)
             $table->decimal('longitude', 10, 7)->nullable();
@@ -49,6 +49,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('dawa_addresses');
+        Schema::dropIfExists('addresses');
     }
 };

@@ -38,9 +38,15 @@ class AddressInput extends Field
 
             $state = $this->getState();
 
-            // State is an array only when the user selected a new suggestion.
+            // State is an array when the user made a new selection.
             // A plain string means the existing address was left unchanged.
             if (! is_array($state) || empty($state)) {
+                return;
+            }
+
+            if ($state['manual'] ?? false) {
+                $record->addManualAddress($state['tekst']);
+
                 return;
             }
 

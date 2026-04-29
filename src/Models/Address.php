@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Address extends Model
 {
-    protected $table = 'dawa_addresses';
+    protected $table = 'addresses';
 
     protected $fillable = [
         'addressable_id',

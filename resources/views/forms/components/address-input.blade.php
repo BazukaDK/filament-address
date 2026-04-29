@@ -11,6 +11,8 @@
             loading: false,
             debounceTimer: null,
             isSelected: false,
+            isManual: false,
+            apiError: false,
 
             init() {
                 // state is a string when hydrated from an existing address, an object after a new selection
@@ -18,6 +20,7 @@
                 this.query = this.displayText(this.state);
 
                 this.$watch('state', (value) => {
+                    if (this.isManual) { return; }
                     this.query = this.displayText(value);
                 });
             },
@@ -33,6 +36,12 @@
             },
 
             onInput() {
+                if (this.isManual) {
+                    this.state = { manual: true, tekst: this.query };
+                    this.isSelected = !! this.query;
+                    return;
+                }
+
                 this.isSelected = false;
                 clearTimeout(this.debounceTimer);
                 this.debounceTimer = setTimeout(() => this.search(), 300);
@@ -52,12 +61,23 @@
                     const response = await fetch(url);
                     this.suggestions = await response.json();
                     this.showSuggestions = this.suggestions.length > 0;
+                    this.apiError = false;
                 } catch {
+                    this.apiError = true;
                     this.suggestions = [];
                     this.showSuggestions = false;
                 } finally {
                     this.loading = false;
                 }
+            },
+
+            enterManualMode() {
+                this.isManual = true;
+                this.isSelected = !! this.query;
+                this.state = { manual: true, tekst: this.query };
+                this.suggestions = [];
+                this.showSuggestions = false;
+                this.$nextTick(() => this.$el.querySelector('input').focus());
             },
 
             select(suggestion) {
@@ -101,11 +121,34 @@
         </x-filament::input.wrapper>
 
         <p
-            x-show="query && ! isSelected"
+            x-show="query && ! isSelected && ! isManual"
             x-cloak
             class="mt-1 text-xs text-warning-600 dark:text-warning-400"
         >
             {{ __('Select an address from the suggestions') }}
+        </p>
+
+        <div
+            x-show="apiError && ! isManual"
+            x-cloak
+            class="mt-1 flex items-center justify-between gap-2 text-xs text-danger-600 dark:text-danger-400"
+        >
+            <span>{{ __('Address lookup unavailable.') }}</span>
+            <button
+                type="button"
+                x-on:click="enterManualMode()"
+                class="font-medium underline hover:no-underline focus:outline-none"
+            >
+                {{ __('Enter address manually') }}
+            </button>
+        </div>
+
+        <p
+            x-show="isManual"
+            x-cloak
+            class="mt-1 text-xs text-gray-500 dark:text-gray-400"
+        >
+            {{ __('Manually entered — will be normalized overnight') }}
         </p>
 
         <div
