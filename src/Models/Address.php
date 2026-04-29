@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Address extends Model
 {
-    protected $table = 'addresses';
+    public function getTable(): string
+    {
+        return config('filament-address.table', 'addresses');
+    }
 
     protected $fillable = [
         'addressable_id',

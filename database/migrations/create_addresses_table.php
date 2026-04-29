@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('addresses', function (Blueprint $table) {
+        Schema::create(config('filament-address.table', 'addresses'), function (Blueprint $table) {
             $table->id();
 
             // Polymorphic owner — attach to any model via HasAddresses trait
@@ -49,6 +49,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('addresses');
+        Schema::dropIfExists(config('filament-address.table', 'addresses'));
     }
 };

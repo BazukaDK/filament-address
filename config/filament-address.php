@@ -8,4 +8,10 @@ return [
      */
     'address_model' => Bazuka\FilamentAddress\Models\Address::class,
 
+    /*
+     * The database table name used to store addresses. Change this before
+     * running migrations if "addresses" conflicts with an existing table.
+     */
+    'table' => 'addresses',
+
 ];
