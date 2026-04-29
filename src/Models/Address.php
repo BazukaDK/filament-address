@@ -13,7 +13,7 @@ class Address extends Model
         'addressable_id',
         'addressable_type',
         'label',
-        'dawa_id',
+        'source_id',
         'formatted_address',
         'street_name',
         'house_number',
@@ -51,7 +51,7 @@ class Address extends Model
         $data = $suggestion['data'];
 
         return [
-            'dawa_id' => $data['id'],
+            'source_id' => $data['id'],
             'formatted_address' => static::cleanText($suggestion['tekst']),
             'street_name' => $data['vejnavn'],
             'house_number' => $data['husnr'],

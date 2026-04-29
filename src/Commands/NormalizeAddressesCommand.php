@@ -16,7 +16,7 @@ class NormalizeAddressesCommand extends Command
     {
         $model = Address::getModel();
 
-        $addresses = $model::whereNull('dawa_id')
+        $addresses = $model::whereNull('source_id')
             ->limit((int) $this->option('limit'))
             ->get();
 

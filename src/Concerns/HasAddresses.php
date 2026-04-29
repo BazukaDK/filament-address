@@ -41,7 +41,7 @@ trait HasAddresses
         if ($existing) {
             $existing->update([
                 'formatted_address' => $formatted,
-                'dawa_id' => null,
+                'source_id' => null,
                 'street_name' => null,
                 'house_number' => null,
                 'floor' => null,
@@ -78,7 +78,7 @@ trait HasAddresses
 
         /** @var Address $address */
         $address = $this->addresses()->updateOrCreate(
-            ['dawa_id' => $attributes['dawa_id'], 'label' => $label],
+            ['source_id' => $attributes['source_id'], 'label' => $label],
             array_merge($attributes, ['label' => $label])
         );
 

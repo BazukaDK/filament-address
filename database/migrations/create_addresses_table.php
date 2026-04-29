@@ -17,8 +17,8 @@ return new class extends Migration
             // Optional label to distinguish multiple addresses on one model (e.g. 'billing', 'shipping')
             $table->string('label')->nullable();
 
-            // DAWA identifier — null for manually entered addresses pending normalization
-            $table->string('dawa_id', 36)->nullable()->index();
+            // External API identifier — null for manually entered addresses pending normalization
+            $table->string('source_id', 36)->nullable()->index();
 
             // Full formatted address string (e.g. "Hersegade 18, 1. th, 4000 Roskilde")
             $table->string('formatted_address');
