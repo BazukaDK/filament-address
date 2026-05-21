@@ -10,7 +10,7 @@ class NormalizeAddressesCommand extends Command
 {
     protected $signature = 'filament-address:normalize {--limit=100 : Maximum number of addresses to process}';
 
-    protected $description = 'Normalize manually entered addresses using the DAWA API';
+    protected $description = 'Normalize manually entered addresses using the Adressevælger API';
 
     public function handle(): int
     {
@@ -32,7 +32,7 @@ class NormalizeAddressesCommand extends Command
         foreach ($addresses as $address) {
             $suggestion = AddressService::bestAddressMatch($address->formatted_address);
 
-            if ($suggestion && ! empty($suggestion['data']['id'])) {
+            if ($suggestion && ! empty($suggestion['id_lokalid'])) {
                 $address->update($model::attributesFromSuggestion($suggestion));
                 $normalized++;
             } else {

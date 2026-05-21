@@ -44,28 +44,28 @@ class Address extends Model
     }
 
     /**
-     * Map an autocomplete suggestion to Address attribute values.
+     * Map an address lookup response (from AddressService::addressById) to Address attribute values.
      *
-     * @param  array<string, mixed>  $suggestion
+     * @param  array<string, mixed>  $adresse
      * @return array<string, mixed>
      */
-    public static function attributesFromSuggestion(array $suggestion): array
+    public static function attributesFromSuggestion(array $adresse): array
     {
-        $data = $suggestion['data'];
+        $husnummer = $adresse['husnummer'] ?? [];
 
         return [
-            'source_id' => $data['id'],
-            'formatted_address' => static::cleanText($suggestion['tekst']),
-            'street_name' => $data['vejnavn'],
-            'house_number' => $data['husnr'],
-            'floor' => $data['etage'] ?? null,
-            'door' => $data['dør'] ?? null,
-            'postal_code' => $data['postnr'],
-            'city' => $data['postnrnavn'],
-            'municipality_code' => $data['kommunekode'],
-            'longitude' => $data['x'] ?? null,
-            'latitude' => $data['y'] ?? null,
-            'access_address_id' => $data['adgangsadresseid'] ?? null,
+            'source_id' => $adresse['id_lokalid'] ?? null,
+            'formatted_address' => $adresse['adressebetegnelse'] ?? null,
+            'street_name' => $husnummer['vejnavn'] ?? null,
+            'house_number' => $husnummer['husnummertekst'] ?? null,
+            'floor' => $adresse['etagebetegnelse'] ?? null,
+            'door' => $adresse['doerbetegnelse'] ?? null,
+            'postal_code' => $husnummer['postnummer']['postnr'] ?? null,
+            'city' => $husnummer['postnummer']['navn'] ?? null,
+            'municipality_code' => $husnummer['navngivenvejkommunedel']['kommune'] ?? null,
+            'longitude' => null,
+            'latitude' => null,
+            'access_address_id' => $husnummer['id_lokalid'] ?? null,
         ];
     }
 

@@ -14,4 +14,10 @@ return [
      */
     'table' => 'addresses',
 
+    /*
+     * The API token for the Adressevælger API.
+     * Obtain a token from https://adressevaelger.dk or your administrator.
+     */
+    'api_token' => env('FILAMENT_ADDRESS_API_TOKEN', ''),
+
 ];

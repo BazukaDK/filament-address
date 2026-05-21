@@ -3,6 +3,7 @@
 namespace Bazuka\FilamentAddress\Concerns;
 
 use Bazuka\FilamentAddress\Models\Address;
+use Bazuka\FilamentAddress\Services\AddressService;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -29,7 +30,7 @@ trait HasAddresses
     }
 
     /**
-     * Create or update a manually entered address, clearing all DAWA fields so the
+     * Create or update a manually entered address, clearing all structured fields so the
      * nightly normalization command can fill them in later.
      */
     public function addManualAddress(string $formatted, ?string $label = null): Address
@@ -67,14 +68,21 @@ trait HasAddresses
     }
 
     /**
-     * Create or update an address from an autocomplete suggestion.
+     * Create or update an address from a search fund item (type=adresse).
      *
      * @param  array<string, mixed>  $suggestion
      */
     public function addAddress(array $suggestion, ?string $label = null): Address
     {
         $model = Address::getModel();
-        $attributes = $model::attributesFromSuggestion($suggestion);
+
+        $adresse = AddressService::addressById($suggestion['id']);
+
+        if (! $adresse) {
+            return $this->addManualAddress($suggestion['titel'] ?? '', $label);
+        }
+
+        $attributes = $model::attributesFromSuggestion($adresse);
 
         /** @var Address $address */
         $address = $this->addresses()->updateOrCreate(

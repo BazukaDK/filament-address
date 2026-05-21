@@ -27,7 +27,7 @@
 
             displayText(value) {
                 if (! value) { return ''; }
-                const text = typeof value === 'string' ? value : (value.tekst ?? '');
+                const text = typeof value === 'string' ? value : (value.titel ?? '');
                 return this.cleanText(text);
             },
 
@@ -57,9 +57,10 @@
                 this.loading = true;
 
                 try {
-                    const url = 'https://api.dataforsyningen.dk/autocomplete?fuzzy&type=adresse&per_side={{ $getSuggestionCount() }}&q=' + encodeURIComponent(this.query);
+                    const url = 'https://adressevaelger.dk/adresser/soeg?tekst=' + encodeURIComponent(this.query) + '&maksimum={{ $getSuggestionCount() }}&token={{ config("filament-address.api_token") }}';
                     const response = await fetch(url);
-                    this.suggestions = await response.json();
+                    const data = await response.json();
+                    this.suggestions = data.status === 'ok' ? (data.fund ?? []) : [];
                     this.showSuggestions = this.suggestions.length > 0;
                     this.apiError = false;
                 } catch {
@@ -81,15 +82,15 @@
             },
 
             select(suggestion) {
-                if (suggestion.type === 'vejnavn') {
-                    this.query = suggestion.tekst.trim();
+                if (suggestion.type !== 'adresse') {
+                    this.query = suggestion.titel.trim();
                     this.isSelected = false;
                     this.search();
                     return;
                 }
 
                 this.state = suggestion;
-                this.query = this.cleanText(suggestion.tekst);
+                this.query = this.cleanText(suggestion.titel);
                 this.isSelected = true;
                 this.suggestions = [];
                 this.showSuggestions = false;
@@ -168,7 +169,7 @@
                         <button
                             type="button"
                             class="w-full px-3 py-2.5 text-left text-sm text-gray-700 hover:bg-primary-50 focus:bg-primary-50 focus:text-primary-600 focus:outline-none dark:text-gray-200 dark:hover:bg-primary-600/10 dark:focus:bg-primary-600/10 dark:focus:text-primary-400"
-                            x-text="cleanText(suggestion.tekst)"
+                            x-text="cleanText(suggestion.titel)"
                             x-on:click="select(suggestion)"
                             x-on:keydown.enter.prevent="select(suggestion)"
                             x-on:keydown.arrow-down.prevent="$focus.next()"

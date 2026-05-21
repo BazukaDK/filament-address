@@ -12,14 +12,30 @@ class AddressService
     public static function addressAutocomplete(string $address, int $suggestionCount = 10): array
     {
         $response = Http::timeout(5)
-            ->get('https://api.dataforsyningen.dk/autocomplete', [
-                'fuzzy' => '',
-                'type' => 'adresse',
-                'q' => $address,
-                'per_side' => $suggestionCount,
+            ->get('https://adressevaelger.dk/adresser/soeg', [
+                'tekst' => $address,
+                'maksimum' => $suggestionCount,
+                'token' => config('filament-address.api_token'),
             ]);
 
-        return $response->json() ?? [];
+        $data = $response->json();
+
+        return ($data['status'] ?? null) === 'ok' ? ($data['fund'] ?? []) : [];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public static function addressById(string $id): ?array
+    {
+        $response = Http::timeout(5)
+            ->get("https://adressevaelger.dk/adresser/{$id}", [
+                'token' => config('filament-address.api_token'),
+            ]);
+
+        $data = $response->json();
+
+        return ($data['status'] ?? null) === 'ok' ? ($data['adresse'] ?? null) : null;
     }
 
     /**
@@ -29,6 +45,12 @@ class AddressService
     {
         $results = static::addressAutocomplete($address, 1);
 
-        return $results[0] ?? null;
+        $first = collect($results)->firstWhere('type', 'adresse');
+
+        if (! $first) {
+            return null;
+        }
+
+        return static::addressById($first['id']);
     }
 }
