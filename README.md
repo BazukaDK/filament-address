@@ -1,6 +1,6 @@
 # Filament Address
 
-A Filament v5 plugin that integrates the Danish Address Web API ([DAWA](https://dawadocs.dataforsyningen.dk/)) into your Filament forms. Provides an autocomplete input field for Danish addresses, backed by a polymorphic `Address` model.
+A Filament v5 plugin that integrates the Danish [Adressevælger API](https://adressevaelger.dk) into your Filament forms. Provides an autocomplete input field for Danish addresses, backed by a polymorphic `Address` model.
 
 ## Requirements
 
@@ -28,6 +28,14 @@ Optionally publish the config:
 ```bash
 php artisan vendor:publish --tag=filament-address-config
 ```
+
+Add your API token to `.env`:
+
+```env
+FILAMENT_ADDRESS_API_TOKEN=your-token-here
+```
+
+Obtain a token from [adressevaelger.dk](https://adressevaelger.dk) or your administrator.
 
 ### Custom Theme (required)
 
@@ -98,7 +106,7 @@ AddressInput::make('address')
     ->suggestionCount(8),
 ```
 
-The field calls the DAWA autocomplete API directly from the browser as the user types (debounced at 300 ms). No API key is required.
+The field calls the Adressevælger API directly from the browser as the user types (debounced at 300 ms).
 
 ### 3. Reading the stored address
 
@@ -109,15 +117,13 @@ $customer->address->formatted_address; // "Amaliegade 18, 1256 København K"
 $customer->address->street_name;       // "Amaliegade"
 $customer->address->postal_code;       // "1256"
 $customer->address->city;              // "København K"
-$customer->address->latitude;          // 55.6810...
-$customer->address->longitude;         // 12.5856...
 ```
 
 ## Available Address Attributes
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
-| `dawa_id` | string (UUID) | DAWA unique address identifier |
+| `source_id` | string (UUID) | Adressevælger unique address identifier |
 | `formatted_address` | string | Full formatted address string |
 | `street_name` | string | Street name |
 | `house_number` | string | House number |
@@ -126,9 +132,9 @@ $customer->address->longitude;         // 12.5856...
 | `postal_code` | string | Postal code |
 | `city` | string | City name |
 | `municipality_code` | string | Municipality code |
-| `longitude` | float\|null | WGS84 longitude |
-| `latitude` | float\|null | WGS84 latitude |
-| `access_address_id` | string\|null | DAWA access address reference |
+| `longitude` | float\|null | Longitude |
+| `latitude` | float\|null | Latitude |
+| `access_address_id` | string\|null | Associated house number identifier |
 | `label` | string\|null | Optional label (e.g. `billing`, `shipping`) |
 
 ## Configuration
@@ -137,6 +143,7 @@ $customer->address->longitude;         // 12.5856...
 // config/filament-address.php
 return [
     'address_model' => \Bazuka\FilamentAddress\Models\Address::class,
+    'api_token'     => env('FILAMENT_ADDRESS_API_TOKEN', ''),
 ];
 ```
 
@@ -153,10 +160,13 @@ For programmatic address lookup outside of forms:
 ```php
 use Bazuka\FilamentAddress\Services\AddressService;
 
-// Returns up to $count suggestions
+// Returns up to $count suggestions from the search endpoint
 $suggestions = AddressService::addressAutocomplete('Amalieg', 5);
 
-// Returns the single best match, or null
+// Fetches the full address record for a given address ID
+$adresse = AddressService::addressById('d632f4fc-8190-4462-846d-47391e9a9afe');
+
+// Returns the full address record for the single best text match, or null
 $match = AddressService::bestAddressMatch('Amaliegade 18, København');
 ```
 
