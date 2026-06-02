@@ -69,6 +69,19 @@ class Address extends Model
         ];
     }
 
+    /**
+     * Build a formatted address string from raw field data.
+     *
+     * @param  array{street_name?: string|null, house_number?: string|null, floor?: string|null, door?: string|null, postal_code?: string|null, city?: string|null}  $data
+     */
+    public static function formatFromFields(array $data): string
+    {
+        $streetLine = trim(($data['street_name'] ?? '').' '.($data['house_number'] ?? ''));
+        $cityLine = trim(($data['postal_code'] ?? '').' '.($data['city'] ?? ''));
+
+        return implode(', ', array_filter([$streetLine, $cityLine]));
+    }
+
     public static function cleanText(string $text): string
     {
         $parts = array_filter(array_map('trim', explode(',', $text)));
