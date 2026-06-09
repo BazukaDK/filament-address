@@ -15,7 +15,7 @@ class Address extends Model
     protected $fillable = [
         'addressable_id',
         'addressable_type',
-        'label',
+        'type',
         'source_id',
         'formatted_address',
         'street_name',
@@ -24,10 +24,9 @@ class Address extends Model
         'door',
         'postal_code',
         'city',
-        'municipality_code',
+        'supplementary_city',
         'longitude',
         'latitude',
-        'access_address_id',
     ];
 
     protected function casts(): array
@@ -46,33 +45,30 @@ class Address extends Model
     /**
      * Map an address lookup response (from AddressService::addressById) to Address attribute values.
      *
-     * @param  array<string, mixed>  $adresse
+     * @param  array<string, mixed>  $address
      * @return array<string, mixed>
      */
-    public static function attributesFromSuggestion(array $adresse): array
+    public static function attributesFromSuggestion(array $address): array
     {
-        $husnummer = $adresse['husnummer'] ?? [];
-
         return [
-            'source_id' => $adresse['id_lokalid'] ?? null,
-            'formatted_address' => $adresse['adressebetegnelse'] ?? null,
-            'street_name' => $husnummer['vejnavn'] ?? null,
-            'house_number' => $husnummer['husnummertekst'] ?? null,
-            'floor' => $adresse['etagebetegnelse'] ?? null,
-            'door' => $adresse['doerbetegnelse'] ?? null,
-            'postal_code' => $husnummer['postnummer']['postnr'] ?? null,
-            'city' => $husnummer['postnummer']['navn'] ?? null,
-            'municipality_code' => $husnummer['navngivenvejkommunedel']['kommune'] ?? null,
-            'longitude' => null,
-            'latitude' => null,
-            'access_address_id' => $husnummer['id_lokalid'] ?? null,
+            'source_id' => $address['id'] ?? null,
+            'formatted_address' => $address['full_address'] ?? null,
+            'street_name' => $address['street_name'] ?? null,
+            'house_number' => $address['street_number'] ?? null,
+            'floor' => $address['floor'] ?? null,
+            'door' => $address['door'] ?? null,
+            'postal_code' => $address['zip_code'] ?? null,
+            'city' => $address['city'] ?? null,
+            'supplementary_city' => $address['supplementary_city'] ?? null,
+            'longitude' => $address['coordinates']['lng'] ?? null,
+            'latitude' => $address['coordinates']['lat'] ?? null,
         ];
     }
 
     /**
      * Build a formatted address string from raw field data.
      *
-     * @param  array{street_name?: string|null, house_number?: string|null, floor?: string|null, door?: string|null, postal_code?: string|null, city?: string|null}  $data
+     * @param  array{street_name?: string|null, house_number?: string|null, postal_code?: string|null, city?: string|null}  $data
      */
     public static function formatFromFields(array $data): string
     {

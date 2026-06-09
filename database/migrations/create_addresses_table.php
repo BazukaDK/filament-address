@@ -15,7 +15,7 @@ return new class extends Migration
             $table->morphs('addressable');
 
             // Optional label to distinguish multiple addresses on one model (e.g. 'billing', 'shipping')
-            $table->string('label')->nullable();
+            $table->string('type')->nullable();
 
             // External API identifier — null for manually entered addresses pending normalization
             $table->string('source_id', 36)->nullable()->index();

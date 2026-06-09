@@ -17,7 +17,7 @@ class FilamentAddressServiceProvider extends PackageServiceProvider
             ->hasConfigFile('filament-address')
             ->hasViews()
             ->hasTranslations()
-            ->hasMigration('create_addresses_table')
+            ->hasMigrations(['create_addresses_table', 'normalize_addresses_table', 'rename_label_to_type_in_addresses_table'])
             ->hasCommand(NormalizeAddressesCommand::class);
     }
 

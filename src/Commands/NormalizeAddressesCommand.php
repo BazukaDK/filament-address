@@ -32,7 +32,7 @@ class NormalizeAddressesCommand extends Command
         foreach ($addresses as $address) {
             $suggestion = AddressService::bestAddressMatch($address->formatted_address);
 
-            if ($suggestion && ! empty($suggestion['id_lokalid'])) {
+            if ($suggestion && ! empty($suggestion['id'])) {
                 $address->update($model::attributesFromSuggestion($suggestion));
                 $normalized++;
             } else {

@@ -33,11 +33,11 @@ trait HasAddresses
      * Create or update a manually entered address, clearing all structured fields so the
      * nightly normalization command can fill them in later.
      */
-    public function addManualAddress(string $formatted, ?string $label = null): Address
+    public function addManualAddress(string $formatted, ?string $type = null): Address
     {
         $model = Address::getModel();
 
-        $existing = $this->addresses()->where('label', $label)->first();
+        $existing = $this->addresses()->where('type', $type)->first();
 
         if ($existing) {
             $existing->update([
@@ -49,10 +49,9 @@ trait HasAddresses
                 'door' => null,
                 'postal_code' => null,
                 'city' => null,
-                'municipality_code' => null,
+                'supplementary_city' => null,
                 'longitude' => null,
                 'latitude' => null,
-                'access_address_id' => null,
             ]);
 
             return $existing->fresh();
@@ -61,7 +60,7 @@ trait HasAddresses
         /** @var Address $address */
         $address = $this->addresses()->create([
             'formatted_address' => $formatted,
-            'label' => $label,
+            'type' => $type,
         ]);
 
         return $address;
@@ -71,9 +70,9 @@ trait HasAddresses
      * Create or update an address from raw field data, attempting API normalization immediately.
      * Falls back to storing the raw fields if the lookup fails; the nightly command will retry.
      *
-     * @param  array{street_name?: string|null, house_number?: string|null, floor?: string|null, door?: string|null, postal_code?: string|null, city?: string|null}  $data
+     * @param  array{street_name?: string|null, house_number?: string|null, postal_code?: string|null, city?: string|null}  $data
      */
-    public function addRawAddress(array $data, ?string $label = null): Address
+    public function addRawAddress(array $data, ?string $type = null): Address
     {
         $model = Address::getModel();
 
@@ -81,14 +80,18 @@ trait HasAddresses
 
         $suggestion = AddressService::bestAddressMatch($formatted);
 
-        if ($suggestion && ! empty($suggestion['id_lokalid'])) {
+        if ($suggestion && ! empty($suggestion['id'])) {
             $attributes = $model::attributesFromSuggestion($suggestion);
+            $existing = $this->addresses()->where('type', $type)->first();
+
+            if ($existing) {
+                $existing->update(array_merge($attributes, ['type' => $type]));
+
+                return $existing->fresh();
+            }
 
             /** @var Address $address */
-            $address = $this->addresses()->updateOrCreate(
-                ['source_id' => $attributes['source_id'], 'label' => $label],
-                array_merge($attributes, ['label' => $label])
-            );
+            $address = $this->addresses()->create(array_merge($attributes, ['type' => $type]));
 
             return $address;
         }
@@ -98,17 +101,14 @@ trait HasAddresses
             'source_id' => null,
             'street_name' => $data['street_name'] ?? null,
             'house_number' => $data['house_number'] ?? null,
-            'floor' => $data['floor'] ?? null,
-            'door' => $data['door'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
             'city' => $data['city'] ?? null,
-            'municipality_code' => null,
+            'supplementary_city' => null,
             'longitude' => null,
             'latitude' => null,
-            'access_address_id' => null,
         ];
 
-        $existing = $this->addresses()->where('label', $label)->first();
+        $existing = $this->addresses()->where('type', $type)->first();
 
         if ($existing) {
             $existing->update($rawAttributes);
@@ -117,7 +117,7 @@ trait HasAddresses
         }
 
         /** @var Address $address */
-        $address = $this->addresses()->create(array_merge($rawAttributes, ['label' => $label]));
+        $address = $this->addresses()->create(array_merge($rawAttributes, ['type' => $type]));
 
         return $address;
     }
@@ -127,23 +127,27 @@ trait HasAddresses
      *
      * @param  array<string, mixed>  $suggestion
      */
-    public function addAddress(array $suggestion, ?string $label = null): Address
+    public function addAddress(array $suggestion, ?string $type = null): Address
     {
         $model = Address::getModel();
 
-        $adresse = AddressService::addressById($suggestion['id']);
+        $address = AddressService::addressById($suggestion['id']);
 
-        if (! $adresse) {
-            return $this->addManualAddress($suggestion['titel'] ?? '', $label);
+        if (! $address) {
+            return $this->addManualAddress($suggestion['titel'] ?? '', $type);
         }
 
-        $attributes = $model::attributesFromSuggestion($adresse);
+        $attributes = $model::attributesFromSuggestion($address);
+        $existing = $this->addresses()->where('type', $type)->first();
+
+        if ($existing) {
+            $existing->update(array_merge($attributes, ['type' => $type]));
+
+            return $existing->fresh();
+        }
 
         /** @var Address $address */
-        $address = $this->addresses()->updateOrCreate(
-            ['source_id' => $attributes['source_id'], 'label' => $label],
-            array_merge($attributes, ['label' => $label])
-        );
+        $address = $this->addresses()->create(array_merge($attributes, ['type' => $type]));
 
         return $address;
     }

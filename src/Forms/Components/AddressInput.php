@@ -14,23 +14,23 @@ class AddressInput extends Field
 
     protected int $suggestionCount = 10;
 
+    protected ?string $addressType = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Do not try to set this as a plain attribute on the model.
         $this->dehydrated(false);
 
-        // When editing, populate the display value from the existing address relationship.
         $this->afterStateHydrated(function (AddressInput $component, ?Model $record): void {
-            if (! $record || ! method_exists($record, 'address')) {
+            if (! $record || ! method_exists($record, 'addresses')) {
                 return;
             }
 
-            $component->state($record->address?->formatted_address);
+            $address = $record->addresses()->where('type', $component->addressType)->first();
+            $component->state($address?->formatted_address);
         });
 
-        // After the record is saved, persist the selected suggestion via HasAddresses.
         $this->saveRelationshipsUsing(function (?Model $record): void {
             if (! $record || ! method_exists($record, 'addAddress')) {
                 return;
@@ -45,13 +45,25 @@ class AddressInput extends Field
             }
 
             if ($state['manual'] ?? false) {
-                $record->addManualAddress($state['tekst']);
+                $record->addManualAddress($state['tekst'], $this->addressType);
 
                 return;
             }
 
-            $record->addAddress($state);
+            $record->addAddress($state, $this->addressType);
         });
+    }
+
+    public function addressType(?string $type): static
+    {
+        $this->addressType = $type;
+
+        return $this;
+    }
+
+    public function getAddressType(): ?string
+    {
+        return $this->addressType;
     }
 
     public function suggestionCount(int $count): static

@@ -24,7 +24,7 @@ class AddressService
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array{id: string|null, full_address: string|null, street_name: string|null, street_number: string|null, floor: string|null, door: string|null, zip_code: string|null, city: string|null, supplementary_city: string|null, coordinates: array{lng: float, lat: float}|null}|null
      */
     public static function addressById(string $id): ?array
     {
@@ -39,14 +39,38 @@ class AddressService
             return null;
         }
 
-        $adresse = $data['adresse'] ?? null;
+        $address = $data['adresse'] ?? null;
 
-        if ($adresse) {
-            $utm = $adresse['husnummer']['adgangspunkt']['koordinater'] ?? null;
-            $adresse['wgs84'] = $utm ? static::utm32nToWgs84($utm['x'], $utm['y']) : null;
+        if (! $address) {
+            return null;
         }
 
-        return $adresse;
+        $utm = $address['husnummer']['adgangspunkt']['koordinater'] ?? null;
+        $address['coordinates'] = $utm ? static::utm32nToWgs84($utm['x'], $utm['y']) : null;
+
+        return static::normalizeAddress($address);
+    }
+
+    /**
+     * @param  array<string, mixed>  $address
+     * @return array{id: string|null, full_address: string|null, street_name: string|null, street_number: string|null, floor: string|null, door: string|null, zip_code: string|null, city: string|null, supplementary_city: string|null, coordinates: array{lng: float, lat: float}|null}
+     */
+    private static function normalizeAddress(array $address): array
+    {
+        $houseNumber = $address['husnummer'] ?? [];
+
+        return [
+            'id' => $address['id_lokalid'] ?? null,
+            'full_address' => $address['adressebetegnelse'] ?? null,
+            'street_name' => $houseNumber['vejnavn'] ?? null,
+            'street_number' => $houseNumber['husnummertekst'] ?? null,
+            'floor' => $address['etagebetegnelse'] ?? null,
+            'door' => $address['doerbetegnelse'] ?? null,
+            'zip_code' => $houseNumber['postnummer']['postnr'] ?? null,
+            'city' => $houseNumber['postnummer']['navn'] ?? null,
+            'supplementary_city' => $houseNumber['supplerendebynavn']['navn'] ?? null,
+            'coordinates' => $address['coordinates'] ?? null,
+        ];
     }
 
     /**
