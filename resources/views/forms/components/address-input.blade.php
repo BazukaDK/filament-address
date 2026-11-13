@@ -10,6 +10,7 @@
             showSuggestions: false,
             loading: false,
             debounceTimer: null,
+            latestSearchId: 0,
             isSelected: false,
             isManual: false,
             apiError: false,
@@ -54,21 +55,29 @@
                     return;
                 }
 
+                // Only the latest search may update the list, so a slow earlier answer can't replace a newer one.
+                const searchId = ++this.latestSearchId;
                 this.loading = true;
 
                 try {
-                    const url = 'https://adressevaelger.dk/adresser/soeg?tekst=' + encodeURIComponent(this.query) + '&maksimum={{ $getSuggestionCount() }}&token={{ config("filament-address.api_token") }}';
-                    const response = await fetch(url);
-                    const data = await response.json();
-                    this.suggestions = data.status === 'ok' ? (data.fund ?? []) : [];
+                    // The search runs on the server, which keeps the API token out of the browser.
+                    const result = await $wire.callSchemaComponentMethod(@js($getKey()), 'searchAddresses', { query: this.query });
+
+                    if (searchId !== this.latestSearchId) { return; }
+
+                    this.apiError = ! result?.ok;
+                    this.suggestions = result?.suggestions ?? [];
                     this.showSuggestions = this.suggestions.length > 0;
-                    this.apiError = false;
                 } catch {
+                    if (searchId !== this.latestSearchId) { return; }
+
                     this.apiError = true;
                     this.suggestions = [];
                     this.showSuggestions = false;
                 } finally {
-                    this.loading = false;
+                    if (searchId === this.latestSearchId) {
+                        this.loading = false;
+                    }
                 }
             },
 
