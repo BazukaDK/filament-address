@@ -2,9 +2,13 @@
 
 namespace Bazuka\FilamentAddress\Forms\Components;
 
+use Bazuka\FilamentAddress\Services\AddressService;
 use Filament\Forms\Components\Concerns\HasPlaceholder;
 use Filament\Forms\Components\Field;
+use Filament\Support\Components\Attributes\ExposedLivewireMethod;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Attributes\Renderless;
 
 class AddressInput extends Field
 {
@@ -15,6 +19,13 @@ class AddressInput extends Field
     protected int $suggestionCount = 10;
 
     protected ?string $addressType = null;
+
+    /**
+     * Searches per minute one session may make, so the field can't be used to drain the API token's quota.
+     */
+    public const SEARCHES_PER_MINUTE = 120;
+
+    private const MAX_QUERY_LENGTH = 200;
 
     protected function setUp(): void
     {
@@ -45,13 +56,51 @@ class AddressInput extends Field
             }
 
             if ($state['manual'] ?? false) {
-                $record->addManualAddress($state['tekst'], $this->addressType);
+                $record->addManualAddress((string) ($state['tekst'] ?? ''), $this->addressType);
 
                 return;
             }
 
             $record->addAddress($state, $this->addressType);
         });
+    }
+
+    /**
+     * Address suggestions for the browser. The search runs on the server, so the API token is never sent
+     * to the browser, and only the fields the dropdown needs are returned.
+     *
+     * @return array{ok: bool, suggestions: list<array{id: mixed, type: mixed, titel: mixed}>}
+     */
+    #[ExposedLivewireMethod]
+    #[Renderless]
+    public function searchAddresses(string $query): array
+    {
+        $query = trim(mb_substr($query, 0, self::MAX_QUERY_LENGTH));
+
+        if (mb_strlen($query) < 2) {
+            return ['ok' => true, 'suggestions' => []];
+        }
+
+        $rateLimitKey = 'filament-address-search:'.(session()->getId() ?: request()->ip());
+
+        if (! RateLimiter::attempt($rateLimitKey, self::SEARCHES_PER_MINUTE, fn (): bool => true)) {
+            return ['ok' => false, 'suggestions' => []];
+        }
+
+        $suggestions = AddressService::search($query, $this->getSuggestionCount());
+
+        if ($suggestions === null) {
+            return ['ok' => false, 'suggestions' => []];
+        }
+
+        return [
+            'ok' => true,
+            'suggestions' => array_map(fn (array $suggestion): array => [
+                'id' => $suggestion['id'] ?? null,
+                'type' => $suggestion['type'] ?? null,
+                'titel' => $suggestion['titel'] ?? '',
+            ], $suggestions),
+        ];
     }
 
     public function addressType(?string $type): static

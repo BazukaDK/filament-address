@@ -143,7 +143,12 @@ $customer->address->city;              // "København K"
 // config/filament-address.php
 return [
     'address_model' => \Bazuka\FilamentAddress\Models\Address::class,
-    'api_token'     => env('FILAMENT_ADDRESS_API_TOKEN', ''),
+    'table' => 'addresses',
+    'api_token' => env('FILAMENT_ADDRESS_API_TOKEN', ''),
+    'base_url' => env('FILAMENT_ADDRESS_BASE_URL', 'https://adressevaelger.dk'),
+    'timeout' => 5,
+    'normalize_at' => env('FILAMENT_ADDRESS_NORMALIZE_AT', '02:00'), // null: schedule it yourself
+    'normalize_retry_after_days' => 7,
 ];
 ```
 
@@ -153,6 +158,16 @@ You can swap in your own model as long as it extends `Bazuka\FilamentAddress\Mod
 'address_model' => \App\Models\Address::class,
 ```
 
+The API token stays on the server: the form field searches through a Livewire call, so the token is never sent to the browser. Each session may search 120 times a minute.
+
+## Normalizing manual addresses
+
+Addresses typed by hand, or saved while the API was down, are matched by `filament-address:normalize`. It runs daily at `normalize_at`, on one server only. An address is only matched when the postal code and house number agree with what was entered. Addresses that can't be matched wait `normalize_retry_after_days` before they are tried again, so they never block newer ones.
+
+## Failures
+
+A slow or unreachable API never stops a save: `addRawAddress()` keeps the raw fields, `addAddress()` keeps the text, and the nightly command tries again later. Failed lookups are logged as warnings.
+
 ## AddressService
 
 For programmatic address lookup outside of forms:
@@ -160,14 +175,34 @@ For programmatic address lookup outside of forms:
 ```php
 use Bazuka\FilamentAddress\Services\AddressService;
 
-// Returns up to $count suggestions from the search endpoint
+// Up to $count suggestions; an empty list when nothing is found or the API is down
 $suggestions = AddressService::addressAutocomplete('Amalieg', 5);
 
-// Fetches the full address record for a given address ID
+// Same, but null when the API is down, so you can tell it apart from "no results"
+$suggestions = AddressService::search('Amalieg', 5);
+
+// The full address for an address id (UUID), or null
 $adresse = AddressService::addressById('d632f4fc-8190-4462-846d-47391e9a9afe');
 
-// Returns the full address record for the single best text match, or null
-$match = AddressService::bestAddressMatch('Amaliegade 18, København');
+// The best match whose postal code and house number agree with the text, or null
+$match = AddressService::bestAddressMatch('Amaliegade 18, 1256 København K');
+```
+
+## Upgrading from 3.0
+
+Publish and run the new migration, which adds `normalization_attempted_at`:
+
+```bash
+php artisan vendor:publish --tag=filament-address-migrations
+php artisan migrate
+```
+
+`addManualAddress()`, `addRawAddress()` and `addAddress()` now return `null` instead of saving an empty address.
+
+## Testing
+
+```bash
+composer test
 ```
 
 ## License

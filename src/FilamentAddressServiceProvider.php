@@ -17,14 +17,24 @@ class FilamentAddressServiceProvider extends PackageServiceProvider
             ->hasConfigFile('filament-address')
             ->hasViews()
             ->hasTranslations()
-            ->hasMigrations(['create_addresses_table', 'normalize_addresses_table', 'rename_label_to_type_in_addresses_table'])
+            ->hasMigrations(['create_addresses_table', 'normalize_addresses_table', 'rename_label_to_type_in_addresses_table', 'add_normalization_attempted_at_to_addresses_table'])
             ->hasCommand(NormalizeAddressesCommand::class);
     }
 
     public function packageBooted(): void
     {
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule): void {
-            $schedule->command(NormalizeAddressesCommand::class)->dailyAt('02:00');
+            $time = config('filament-address.normalize_at');
+
+            if (blank($time)) {
+                return;
+            }
+
+            // onOneServer() keeps the run single when several app servers share the schedule.
+            $schedule->command(NormalizeAddressesCommand::class)
+                ->dailyAt($time)
+                ->withoutOverlapping()
+                ->onOneServer();
         });
     }
 }

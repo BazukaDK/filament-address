@@ -17,6 +17,7 @@ class Address extends Model
         'addressable_type',
         'type',
         'source_id',
+        'normalization_attempted_at',
         'formatted_address',
         'street_name',
         'house_number',
@@ -34,6 +35,7 @@ class Address extends Model
         return [
             'longitude' => 'float',
             'latitude' => 'float',
+            'normalization_attempted_at' => 'datetime',
         ];
     }
 
